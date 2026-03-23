@@ -28,7 +28,7 @@
     "social-security",
     "planning"
   ],
-  "author": "Justice",
+  "author": "Justice E. Chase",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
