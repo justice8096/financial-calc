@@ -4,8 +4,12 @@
   "description": "Retirement planning calculations: taxes, inflation, RMD, Social Security",
   "type": "module",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
     "./taxes": "./src/taxes.js",
     "./inflation": "./src/inflation.js",
     "./rmd": "./src/rmd.js",

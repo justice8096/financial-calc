@@ -59,11 +59,15 @@ describe('social-security', () => {
     });
 
     it('should reduce spousal benefit for early claiming', () => {
+      // Signature: calcSpousalBenefit(spousePIA, ownPIA, ownFRA, claimAge)
       const spousePIA = 4000;
       const ownPIA = 1000;
-      const atFRA = calcSpousalBenefit(spousePIA, ownPIA, 67, 67);
-      const earlyFive = calcSpousalBenefit(spousePIA, ownPIA, 62, 67);
+      const ownFRA = 67;
+      const atFRA = calcSpousalBenefit(spousePIA, ownPIA, ownFRA, 67); // claim at FRA
+      const earlyFive = calcSpousalBenefit(spousePIA, ownPIA, ownFRA, 62); // claim 5 years early
       assert.ok(earlyFive < atFRA);
+      assert.equal(atFRA, 1000); // 2000 - 1000
+      assert.equal(earlyFive, 700); // 1000 * (1 - 0.3)
     });
 
     it('should return 0 for negative results', () => {

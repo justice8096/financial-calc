@@ -1,6 +1,6 @@
 # Financial Calculation Library
 
-ESM-based utilities for retirement planning calculations: taxes, inflation, RMD, Social Security benefits, and formatting.
+ESM-based utilities for retirement planning calculations: taxes, inflation, RMD, Social Security benefits, and formatting. Zero npm dependencies, fully generic and flexible.
 
 ## Installation
 
@@ -8,16 +8,30 @@ ESM-based utilities for retirement planning calculations: taxes, inflation, RMD,
 npm install @justice8096/financial-calc
 ```
 
-## Modules
+## Features
 
-### Taxes (`src/taxes.js`)
+- **Pure JavaScript** – Zero npm dependencies, runs anywhere
+- **Generic modules** – Tax bracket engine and inflation projector work with any tax system or country
+- **Retirement-specific** – Specialized calculations for US Social Security and RMDs (SECURE 2.0 Act)
+- **TypeScript support** – Full `.d.ts` declarations included
+- **Deterministic** – All functions are side-effect-free and purely computational
 
-Calculate federal and state income taxes with bracket-based systems.
+## Module Overview
+
+Modules are split into two categories:
+
+### Generic Modules
+
+These work with any tax system, any currency, or any financial scenario.
+
+#### Taxes (`src/taxes.js`)
+
+Generic bracket-based tax calculation engine plus US-specific tax functions.
 
 ```javascript
 import { calcBracketTax, calcTaxesForLocation } from '@justice8096/financial-calc/taxes';
 
-// Generic bracket calculation
+// Generic: Any tax bracket system
 const brackets = [
   { min: 0, max: 11000, rate: 0.10 },
   { min: 11000, max: 44725, rate: 0.12 },
@@ -25,7 +39,7 @@ const brackets = [
 ];
 const tax = calcBracketTax(50000, brackets); // $5,525
 
-// US-specific multi-location taxes
+// US-specific: Multi-location with state/federal/foreign credits
 const location = {
   taxes: {
     federalIncomeTax: { standardDeduction: 27700 },
@@ -37,9 +51,9 @@ const result = calcTaxesForLocation(location, 30000, 50000, 20000);
 // { federal: 7500, state: 1200, total: 8700, details: [...] }
 ```
 
-### Inflation (`src/inflation.js`)
+#### Inflation (`src/inflation.js`)
 
-Project costs with inflation and currency drift.
+Project costs with per-category inflation and currency drift.
 
 ```javascript
 import {
@@ -75,9 +89,28 @@ rows.forEach((row) => {
 });
 ```
 
-### RMD (`src/rmd.js`)
+#### Formatting (`src/formatting.js`)
 
-Calculate Required Minimum Distributions (US retirement accounts).
+Format numbers for display.
+
+```javascript
+import { fmt, fmtK, pct } from '@justice8096/financial-calc/formatting';
+
+fmt(50000); // "$50,000"
+fmtK(50000); // "$50K"
+pct(0.25); // "25.0%"
+```
+
+### Retirement-Specific Modules
+
+Specialized calculations for US retirement planning.
+
+#### RMD (`src/rmd.js`)
+
+Calculate Required Minimum Distributions (US retirement accounts). Follows SECURE 2.0 Act rules:
+- Born ≤1950: RMDs start at 72
+- Born 1951-1959: RMDs start at 73
+- Born 1960+: RMDs start at 75
 
 ```javascript
 import {
@@ -105,9 +138,9 @@ const missedRmd = 20000;
 const penalty = missedRmd * RMD_PENALTY_RATE; // $5,000
 ```
 
-### Social Security (`src/social-security.js`)
+#### Social Security (`src/social-security.js`)
 
-Calculate benefits based on claiming age and spousal benefits.
+Calculate benefits based on claiming age and spousal benefits. Includes early reductions and delayed credits.
 
 ```javascript
 import { calcSSBenefit, calcSpousalBenefit } from '@justice8096/financial-calc/social-security';
@@ -130,21 +163,11 @@ const spousal = calcSpousalBenefit(
 // $500 (max spousal $2500 - own benefit $2500 = $0... but this example would be $500 if own PIA was less)
 ```
 
-### Formatting (`src/formatting.js`)
-
-Format numbers for display.
-
-```javascript
-import { fmt, fmtK, pct } from '@justice8096/financial-calc/formatting';
-
-fmt(50000); // "$50,000"
-fmtK(50000); // "$50K"
-pct(0.25); // "25.0%"
-```
-
 ## API Reference
 
-### calcBracketTax(income, brackets)
+### Taxes Module
+
+#### `calcBracketTax(income, brackets)`
 
 Calculate tax using a bracket system.
 
@@ -154,7 +177,7 @@ Calculate tax using a bracket system.
 
 **Returns:** (number) Tax amount
 
-### calcTaxesForLocation(location, ssIncome, iraIncome, investIncome)
+#### `calcTaxesForLocation(location, ssIncome, iraIncome, investIncome)`
 
 Calculate federal and state taxes for a location.
 
@@ -166,33 +189,92 @@ Calculate federal and state taxes for a location.
 
 **Returns:** (object) Breakdown: `{federal, state, total, details, effectiveRate}`
 
-### getInflationMultiplier(location, category, targetYear, currentYear)
+### Inflation Module
+
+#### `getInflationMultiplier(location, category, targetYear, currentYear)`
 
 Get inflation multiplier for a cost category.
 
-### getProjectedMonthly(location, targetYear, fxDrift, currentYear)
+#### `getFxMultiplier(location, yearsOut, fxDrift)`
+
+Get currency drift multiplier.
+
+#### `getProjectedMonthly(location, targetYear, fxDrift, currentYear)`
 
 Project monthly cost to a target year with inflation and FX drift.
 
-### projectCosts(location, startYear, years, fxDrift, currentYear)
+#### `projectCosts(location, startYear, years, fxDrift, currentYear)`
 
 Full year-by-year cost projection.
 
-### calcRMD(priorYearBalance, age, birthYear)
+### RMD Module
+
+#### `getRMDStartAge(birthYear)`
+
+Get RMD start age based on birth year (72, 73, or 75).
+
+#### `calcRMD(priorYearBalance, age, birthYear)`
 
 Calculate RMD for an individual.
 
-### calcCoupleRMD(priorYearBalance, hAge, wAge, hBirthYear, wBirthYear, hAlive, wAlive)
+#### `calcCoupleRMD(priorYearBalance, hAge, wAge, hBirthYear, wBirthYear, hAlive, wAlive)`
 
 Calculate RMD for a couple (uses older spouse).
 
-### calcSSBenefit(pia, fra, claimAge)
+### Social Security Module
 
-Calculate Social Security benefit.
+#### `calcSSBenefit(pia, fra, claimAge)`
 
-### calcSpousalBenefit(spousePIA, ownPIA, ownFRA, claimAge)
+Calculate Social Security benefit with early/late adjustments.
+
+#### `calcSpousalBenefit(spousePIA, ownPIA, ownFRA, claimAge)`
 
 Calculate spousal benefit.
+
+### Formatting Module
+
+#### `fmt(n)`
+
+Format as currency (e.g., "$50,000").
+
+#### `fmtK(n)`
+
+Format as currency in thousands (e.g., "$50K").
+
+#### `pct(n)`
+
+Format as percentage (e.g., "25.0%").
+
+## Testing
+
+Run tests with Node's built-in test runner:
+
+```bash
+npm test
+```
+
+## TypeScript
+
+Full TypeScript declarations are included in `src/index.d.ts`. All exported functions, types, and interfaces are fully typed.
+
+```typescript
+import { calcBracketTax, TaxBracket } from '@justice8096/financial-calc/taxes';
+
+const brackets: TaxBracket[] = [
+  { min: 0, max: 11000, rate: 0.10 },
+  { min: 11000, max: Infinity, rate: 0.12 },
+];
+
+const tax: number = calcBracketTax(50000, brackets);
+```
+
+## Architecture
+
+All modules are:
+- **Deterministic** – No side effects, no I/O
+- **Zero dependencies** – Pure JavaScript functions
+- **Generic** – Functions accept configuration objects, not location-specific constants
+- **Well-documented** – JSDoc comments on all functions
 
 ## License
 
