@@ -1,0 +1,32 @@
+{
+  "name": "@justice8096/financial-calc",
+  "version": "1.0.0",
+  "description": "Retirement planning calculations: taxes, inflation, RMD, Social Security",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./taxes": "./src/taxes.js",
+    "./inflation": "./src/inflation.js",
+    "./rmd": "./src/rmd.js",
+    "./social-security": "./src/social-security.js",
+    "./formatting": "./src/formatting.js"
+  },
+  "scripts": {
+    "test": "node --test tests/**/*.test.js"
+  },
+  "keywords": [
+    "retirement",
+    "financial",
+    "tax",
+    "inflation",
+    "rmd",
+    "social-security",
+    "planning"
+  ],
+  "author": "Justice",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
